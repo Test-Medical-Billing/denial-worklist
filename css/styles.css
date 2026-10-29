@@ -84,6 +84,7 @@ code { font-size: 12px; background: var(--rule-2); padding: 1px 4px; border-radi
 .msg { padding: 8px 12px; border-radius: var(--radius-sm); font-size: 13px; }
 .msg-error { background: var(--err-bg); color: var(--err-ink); }
 .msg-warn { background: var(--warn-bg); color: var(--warn-ink); }
+.msg-info { background: var(--rule-2); color: var(--ink-2); }
 
 /* Empty */
 .empty { max-width: 640px; padding: 40px 0 56px; }

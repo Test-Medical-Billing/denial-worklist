@@ -91,6 +91,7 @@
     "243": [B.COVERAGE, "Not authorized by the network or primary care provider", "Get a referral from the primary care provider; appeal if one existed."],
     "252": [B.FIX, "Attachment or other documentation required", "Send the required documentation."],
     "253": [B.NONE, "Medicare sequestration reduction", "No action."],
+    "272": [B.REVIEW, "Coverage or program guidelines not met or exceeded", "Check the payer's coverage rules for this service; appeal with records if they were met."],
     "A1": [B.REVIEW, "Claim or service denied", "Read the remark code for the reason."],
     "B7": [B.FIX, "Provider not certified or eligible for this service on this date", "Check provider enrollment/credentialing with this payer."],
     "B11": [B.COVERAGE, "Claim forwarded to the correct payer", "Follow up with the payer it was forwarded to."],

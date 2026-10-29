@@ -27,9 +27,9 @@
   <main class="wrap">
     <section class="loader" aria-label="Load files">
       <label class="drop" id="drop-era" tabindex="0">
-        <input type="file" id="input-era" multiple accept=".835,.txt,.edi,.era,.x12,.dat">
+        <input type="file" id="input-era" multiple accept=".835,.txt,.edi,.era,.x12,.dat,.pdf">
         <span class="drop-title">ERA files</span>
-        <span class="drop-hint">Drop 835 files here, or click to choose</span>
+        <span class="drop-hint">Drop 835 files or Availity PDFs here, or click to choose</span>
         <span class="drop-list" id="list-era"></span>
       </label>
       <label class="drop" id="drop-eft" tabindex="0">
@@ -49,7 +49,7 @@
 
     <section id="empty" class="empty">
       <h2>Start with today's ERA files</h2>
-      <p>Download the 835 files from your clearinghouse and drop them above. You'll get every denial sorted into what to do next, a summary for each practice, and a check that each payment reached the bank.</p>
+      <p>Download the 835 files (or Availity check PDFs) from your clearinghouse and drop them above. You'll get every denial sorted into what to do next, a summary for each practice, and a check that each payment reached the bank.</p>
       <p>New here? Use <strong>Try with sample files</strong> to see how it works with made-up claims.</p>
     </section>
 
@@ -99,6 +99,8 @@
 
   <script src="js/codes.js"></script>
   <script src="js/engine.js"></script>
+  <script src="js/pdf-text.js"></script>
+  <script src="js/availity-pdf.js"></script>
   <script src="js/xlsx-writer.js"></script>
   <script src="js/export.js"></script>
   <script src="js/samples.js"></script>

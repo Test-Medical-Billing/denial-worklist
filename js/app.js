@@ -61,10 +61,37 @@
     });
   }
 
+  // Read one ERA file: an 835 text file or an Availity PDF. Parsed once, then cached.
+  function readEra(f) {
+    return f.arrayBuffer().then(function (buf) {
+      var bytes = new Uint8Array(buf);
+      var head = String.fromCharCode.apply(null, bytes.subarray(0, 5));
+      if (head === "%PDF-") {
+        return window.PdfText.extract(bytes).then(function (pages) {
+          if (!pages.some(function (p) { return p.length; })) {
+            throw new Error(f.name + ": no text found in this PDF. It may be a scanned image, which can't be read");
+          }
+          var r = window.AvailityPdf.parse(pages, f.name);
+          return { name: f.name, txns: r.txns, warnings: r.warnings };
+        }).catch(function (err) { return { name: f.name, error: err.message }; });
+      }
+      return parseText835(f.name, new TextDecoder().decode(bytes));
+    });
+  }
+  function parseText835(name, text) {
+    try { return { name: name, txns: Engine.parse835(text, name), warnings: [] }; }
+    catch (err) { return { name: name, error: err.message + ". Check that this is an 835 ERA file or an Availity PDF" }; }
+  }
+
   function addFiles(fileList, kind) {
     var files = Array.prototype.slice.call(fileList || []);
     if (!files.length) return;
+    if (kind === "era" && files.some(function (f) { return /\.pdf$/i.test(f.name); })) {
+      $("messages").innerHTML = "";
+      message("info", "Reading " + files.length + (files.length === 1 ? " file" : " files") + "…");
+    }
     Promise.all(files.map(function (f) {
+      if (kind === "era") return readEra(f);
       return f.text().then(function (text) { return { name: f.name, text: text }; });
     })).then(function (loaded) {
       var target = kind === "era" ? state.eraFiles : state.eftFiles;
@@ -78,7 +105,7 @@
 
   function loadSamples() {
     var s = window.DENIAL_SAMPLES;
-    state.eraFiles = Object.keys(s.eras).map(function (k) { return { name: k, text: s.eras[k] }; });
+    state.eraFiles = Object.keys(s.eras).map(function (k) { return parseText835(k, s.eras[k]); });
     state.eftFiles = Object.keys(s.eft).map(function (k) { return { name: k, text: s.eft[k] }; });
     run();
   }
@@ -93,19 +120,17 @@
     $("messages").innerHTML = "";
     var txns = [], seen = {};
     state.eraFiles.forEach(function (f) {
-      try {
-        Engine.parse835(f.text, f.name).forEach(function (t) {
-          var key = [t.payer, t.trace, t.amount, t.claims.length].join("|");
-          if (seen[key]) {
-            message("warn", f.name + ": payment " + (t.trace || "") + " is already loaded from " + seen[key] + ", so it was skipped.");
-            return;
-          }
-          seen[key] = f.name;
-          txns.push(t);
-        });
-      } catch (err) {
-        message("error", err.message + ". Check that this is an 835 ERA file.");
-      }
+      if (f.error) { message("error", f.error + "."); return; }
+      (f.warnings || []).forEach(function (w) { message("warn", w); });
+      f.txns.forEach(function (t) {
+        var key = [t.payer, t.trace, t.amount, t.claims.length].join("|");
+        if (seen[key]) {
+          message("warn", f.name + ": payment " + (t.trace || "") + " is already loaded from " + seen[key] + ", so it was skipped.");
+          return;
+        }
+        seen[key] = f.name;
+        txns.push(t);
+      });
     });
 
     var eft = null;
@@ -328,7 +353,7 @@
   }
 
   function renderClaims(r) {
-    var oc = { "Paid": "s-ok", "Partially paid": "s-warn", "Denied": "s-err", "Reversed": "s-warn", "Patient owes all": "s-info" };
+    var oc = { "Paid": "s-ok", "Partially paid": "s-warn", "Denied": "s-err", "Reversed": "s-warn", "Reversed, reprocessed": "s-info", "Patient owes all": "s-info" };
     var claims = r.claims.slice().sort(function (a, b) { return b.actionable - a.actionable; });
     $("t-claims").innerHTML = "<thead><tr><th>Result</th><th>Patient</th><th>Claim</th><th>Service date</th><th>Procedures</th>" +
       '<th class="num">Billed</th><th class="num">Paid</th><th class="num">Patient owes</th><th class="num">To work</th><th>Payer</th><th>Practice</th></tr></thead><tbody>' +

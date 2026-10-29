@@ -6,7 +6,7 @@ Turns ERA (835) files into a daily denial work list, a summary for each practice
 
 ## What it does
 
-1. **Reads ERA files** (835) from any payer or clearinghouse.
+1. **Reads ERA files**: 835 files from any payer or clearinghouse, and **Availity "Check Details" PDFs**.
 2. **Sorts every denial and adjustment** into what to do next:
    - **Fix & resend**: coding or claim errors (missing modifier, wrong place of service, invalid code)
    - **Appeal**: medical necessity, level of service, authorization
@@ -22,7 +22,7 @@ Turns ERA (835) files into a daily denial work list, a summary for each practice
 ## How to use it
 
 1. Open the page (see [SHARING.md](SHARING.md) for how your team gets it).
-2. Drop today's ERA files into **ERA files**.
+2. Drop today's ERA files (835 files or Availity PDFs) into **ERA files**.
 3. Optional: drop the EFT deposit list (CSV) into **EFT deposits**.
 4. Work the list. Download Excel to save or assign work.
 
@@ -60,6 +60,8 @@ Change the action, meaning, or instructions to match your team's process. Codes 
 | `index.html` | The page |
 | `css/styles.css` | Look and layout |
 | `js/engine.js` | Reads 835 and EFT files, builds the work list and reconciliation |
+| `js/pdf-text.js` | Reads the text inside computer-made PDFs (no outside libraries) |
+| `js/availity-pdf.js` | Reads Availity "Check Details" PDF layout |
 | `js/codes.js` | Denial code guide: meaning, action, what to do |
 | `js/export.js`, `js/xlsx-writer.js` | Excel download (no outside libraries) |
 | `js/app.js` | Screen behavior |
@@ -67,6 +69,8 @@ Change the action, meaning, or instructions to match your team's process. Codes 
 | `tools/make-samples.js` | Regenerates the sample files (`node tools/make-samples.js`) |
 
 ## Limits
+
+- **PDFs:** only Availity "Check Details" PDFs are supported. Every check is verified: claim lines must add up to each claim, and claims plus provider adjustments must equal the payment. If anything doesn't add up, the tool shows a warning naming the claim; check it in the PDF. Scanned PDFs can't be read. When possible, use 835 files instead: they're the original data.
 
 - Code meanings are short summaries. Check the official [X12 claim adjustment reason codes](https://x12.org/codes/claim-adjustment-reason-codes) when in doubt.
 - Remark codes (RARC) are shown but not explained yet.

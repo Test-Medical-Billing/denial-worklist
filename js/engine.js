@@ -299,8 +299,16 @@
         claims.push(claimRow);
 
         if (c.statusCode === "22") {
-          work.push(makeItem(t, c, null, { group: "CR", code: "22", amount: -c.paid }, {
-            bucket: B.REVIEW, meaning: "Payer reversed a previous payment", action: "Find the corrected claim in this or a later ERA; check the recoupment." }));
+          // A reversal paired with a reprocessed claim in the same payment is routine: no work item.
+          var redone = t.claims.some(function (o) {
+            return o !== c && o.statusCode !== "22" && o.patientControl === c.patientControl && o.dos === c.dos;
+          });
+          if (redone) {
+            claimRow.outcome = "Reversed, reprocessed";
+          } else {
+            work.push(makeItem(t, c, null, { group: "CR", code: "22", amount: -c.paid }, {
+              bucket: B.REVIEW, meaning: "Payer reversed a previous payment", action: "Find the corrected claim in this or a later ERA; check the recoupment." }));
+          }
         }
         allAdjustments(c).forEach(function (a) {
           if (a.amount === 0) return;
