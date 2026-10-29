@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Denial Worklist</title>
+  <meta name="description" content="Turns ERA (835) and EFT files into a denial work list, practice summary and payment reconciliation. Runs in your browser; files are never uploaded.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div>
+        <h1>Denial worklist</h1>
+        <p class="sub">From ERA files to today's work, biggest dollars first.</p>
+      </div>
+      <p class="privacy" title="Files are read by this page in your browser. Nothing is uploaded to any server.">
+        <svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14"><path d="M8 1 2.5 3.2v4.1c0 3.3 2.3 6.3 5.5 7.2 3.2-.9 5.5-3.9 5.5-7.2V3.2L8 1Z" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="m5.4 8 1.8 1.8 3.4-3.6" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+        Files stay on this computer
+      </p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="loader" aria-label="Load files">
+      <label class="drop" id="drop-era" tabindex="0">
+        <input type="file" id="input-era" multiple accept=".835,.txt,.edi,.era,.x12,.dat">
+        <span class="drop-title">ERA files</span>
+        <span class="drop-hint">Drop 835 files here, or click to choose</span>
+        <span class="drop-list" id="list-era"></span>
+      </label>
+      <label class="drop" id="drop-eft" tabindex="0">
+        <input type="file" id="input-eft" multiple accept=".csv,.txt">
+        <span class="drop-title">EFT deposits <span class="optional">optional</span></span>
+        <span class="drop-hint">Bank or clearinghouse deposit list as CSV, to match payments</span>
+        <span class="drop-list" id="list-eft"></span>
+      </label>
+      <div class="loader-actions">
+        <button type="button" class="btn" id="btn-sample">Try with sample files</button>
+        <button type="button" class="btn btn-quiet" id="btn-clear" hidden>Clear files</button>
+        <label class="toggle"><input type="checkbox" id="mask"> Hide patient names</label>
+      </div>
+    </section>
+
+    <div id="messages" class="messages" role="status" aria-live="polite"></div>
+
+    <section id="empty" class="empty">
+      <h2>Start with today's ERA files</h2>
+      <p>Download the 835 files from your clearinghouse and drop them above. You'll get every denial sorted into what to do next, a summary for each practice, and a check that each payment reached the bank.</p>
+      <p>New here? Use <strong>Try with sample files</strong> to see how it works with made-up claims.</p>
+    </section>
+
+    <section id="results" hidden>
+      <div class="flow" aria-label="Where the billed dollars went">
+        <p class="flow-lead" id="flow-lead"></p>
+        <div class="flow-bar" id="flow-bar"></div>
+        <ul class="flow-legend" id="flow-legend"></ul>
+      </div>
+
+      <div class="tabs-row">
+        <nav class="tabs" role="tablist" id="tabs">
+          <button role="tab" data-tab="work" aria-selected="true">Work list <span class="count" id="count-work"></span></button>
+          <button role="tab" data-tab="practices" aria-selected="false">Practices <span class="count" id="count-practices"></span></button>
+          <button role="tab" data-tab="payments" aria-selected="false">Payments <span class="count" id="count-payments"></span></button>
+          <button role="tab" data-tab="claims" aria-selected="false">Claims <span class="count" id="count-claims"></span></button>
+          <button role="tab" data-tab="guide" aria-selected="false">Code guide</button>
+        </nav>
+        <button type="button" class="btn btn-primary" id="btn-excel">Download Excel</button>
+      </div>
+
+      <div class="panel" id="panel-work" role="tabpanel">
+        <div class="filters">
+          <div class="chips" id="bucket-chips" role="group" aria-label="Filter by action"></div>
+          <div class="filter-fields">
+            <select id="f-practice" aria-label="Practice"></select>
+            <select id="f-payer" aria-label="Payer"></select>
+            <input type="search" id="f-search" placeholder="Search patient, claim, code" aria-label="Search">
+            <label class="toggle"><input type="checkbox" id="f-hide-done"> Hide done</label>
+          </div>
+        </div>
+        <div class="table-wrap"><table class="grid" id="t-work"></table></div>
+      </div>
+
+      <div class="panel" id="panel-practices" role="tabpanel" hidden></div>
+      <div class="panel" id="panel-payments" role="tabpanel" hidden></div>
+      <div class="panel" id="panel-claims" role="tabpanel" hidden>
+        <div class="table-wrap"><table class="grid" id="t-claims"></table></div>
+      </div>
+      <div class="panel" id="panel-guide" role="tabpanel" hidden></div>
+    </section>
+  </main>
+
+  <footer class="wrap foot">
+    <p>Denial reason meanings are short summaries. Check the official <a href="https://x12.org/codes/claim-adjustment-reason-codes" target="_blank" rel="noopener">X12 claim adjustment reason codes</a> when in doubt. Edit <code>js/codes.js</code> to change how your team handles a code.</p>
+  </footer>
+
+  <script src="js/codes.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/xlsx-writer.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/samples.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

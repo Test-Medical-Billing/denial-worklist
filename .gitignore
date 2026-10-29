@@ -1,0 +1,17 @@
+# Never commit real patient data. Only the made-up files in samples/ are allowed.
+*.835
+*.era
+*.edi
+*.x12
+*.dat
+*.csv
+*.xlsx
+*.xls
+*.pdf
+!samples/*.835
+!samples/*.csv
+
+# System files
+.DS_Store
+Thumbs.db
+node_modules/
